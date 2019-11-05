@@ -1,0 +1,92 @@
+	class InOrderIterator2 implements Iterator<T> {
+		HashMap<BinaryNode, Integer> hm;
+		Stack<BinaryNode> st;
+		boolean isnexted;
+		BinaryNode current;
+
+		InOrderIterator2() {
+			st = new Stack<>();
+			hm =new HashMap<>();
+			current = BinarySearchTree.this.root;
+//			st.push(BinarySearchTree.this.root);
+			// hasLeft is used for keeping track with wheter a node's left has been gone or
+			// not
+//			hasLeft.add(BinarySearchTree.this.root);
+			
+			hm.put(current, 1);
+			isnexted = false;
+			BinarySearchTree.this.isModified = false;
+		}
+
+		@Override
+		public boolean hasNext() {
+//			eliminate when b is an empty tree
+			if (hm.size()==BinarySearchTree.this.size()||BinarySearchTree.this.size()<1) {
+				return false;
+			}
+//			use the size to help with has =next
+//			if (hasLeft.size() == BinarySearchTree.this.size() + 1) {
+//				return false;
+//			}
+//			if (st.size() == 1 && hasLeft.size() == BinarySearchTree.this.size()) {
+//				return false;
+//			}
+			return true;
+		}
+
+		@Override
+		public T next() throws ConcurrentModificationException, NoSuchElementException {
+//			if (st.size() == 1 && hasLeft.size() == BinarySearchTree.this.size()) {
+//				throw new NoSuchElementException();
+//			}
+			
+			if (!this.hasNext()) {
+				throw new NoSuchElementException("Nothing left to iter over!");
+			}
+			if (isModified) {
+				throw new ConcurrentModificationException("is modified! need new iterator");
+			}
+			
+			while(true) {
+				
+				if(hm.containsKey(current)) {	
+					if(hm.get(current)==0){
+						return current.data;
+					}else if(hm.get(current)==1){
+						if(current.right!=NULL_NODE) {
+							st.push(current.right);
+							st.push(current);
+							hm.put(current, 0);
+							hm.put(current.right, 2);
+						}
+						current = current.left;
+					}else {
+						st.push(current);
+						hm.put(current,1);
+					}
+				}else {//if current is a new node;
+					if(current.right!=NULL_NODE) {
+						st.push(current.right);
+						hm.put(current, 2);
+					}
+					if(current.left!=NULL_NODE) {
+						st.push(current);
+						hm.put(current,0);
+						current = current.left;
+					}
+				}
+				
+			}
+		}
+
+		public void remove() throws IllegalStateException {
+			if (st.size() == 1 || isnexted == false) {
+				throw new IllegalStateException();
+			}
+//			BinarySearchTree.this.remove(hasLeft.get(0).data);
+//			hasLeft.remove(0);
+			isnexted = false;
+
+		}
+
+	}
